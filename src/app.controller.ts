@@ -13,6 +13,8 @@ export class AppController {
   @Render('index')
   getHello() {
     console.log('check', this.configService.get<string>('PORT'));
-    return { message: this.appService.getHello() };
+    const message1 = this.appService.getHello();
+
+    return { message: message1 };
   }
 }
