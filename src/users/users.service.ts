@@ -44,6 +44,7 @@ export class UsersService {
   }
 
   remove(id: string) {
-    return `This action removes a #${id} user`;
+    if (!mongoose.Types.ObjectId.isValid(id)) return 'not found user';
+    return this.userModel.deleteOne({ _id: id });
   }
 }
