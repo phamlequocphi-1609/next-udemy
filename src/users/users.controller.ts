@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 // import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import mongoose from 'mongoose';
 
 //decorator + gộm tới ví dụ . user  + eric => /user/eric
 @Controller('users') // => /users
@@ -39,6 +40,9 @@ export class UsersController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return 'not found user';
+    }
     return this.usersService.remove(id);
   }
 }
