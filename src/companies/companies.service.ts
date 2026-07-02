@@ -6,7 +6,7 @@ import { Company, CompanyDocument } from './schema/company.schema';
 import type { SoftDeleteModel } from 'soft-delete-plugin-mongoose/dist/src';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
-
+import aqs from 'api-query-params';
 @Injectable()
 export class CompaniesService {
   constructor(
@@ -24,8 +24,35 @@ export class CompaniesService {
     });
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll(currentPage: number, limit: number, qs: string) {
+    const { filter, sort, population, projection } = aqs(qs);
+    delete filter.page;
+    delete filter.limit;
+
+    let defaultLimit = +limit ? +limit : 10;
+    let current = +currentPage ? +currentPage : 1;
+    let offset = (current - 1) * defaultLimit;
+
+    const totalItems = (await this.companyModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
+
+    const result = await this.companyModel
+      .find(filter)
+      .skip(offset)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .populate(population) // để join bản
+      .exec();
+
+    return {
+      meta: {
+        current: current,
+        pageSize: defaultLimit,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result,
+    };
   }
 
   findOne(id: number) {
