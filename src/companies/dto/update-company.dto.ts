@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCompanyDto } from './create-company.dto';
+import { IsNotEmpty } from 'class-validator';
 
-export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {}
+// data transfer object
+export class UpdateCompanyDto {
+  @IsNotEmpty({
+    message: 'Name không được để trống',
+  })
+  name: string;
+
+  @IsNotEmpty({
+    message: 'Address không đươc để trống',
+  })
+  address: string;
+
+  @IsNotEmpty({
+    message: 'Description không đươc để trống',
+  })
+  description: string;
+}
