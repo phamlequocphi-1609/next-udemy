@@ -4,7 +4,7 @@ import * as dns from 'dns';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 
@@ -30,6 +30,16 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
   });
+
+  //config tiền tố global api
+  app.setGlobalPrefix('api');
+  // config version
+  app.enableVersioning({
+    type: VersioningType.URI,
+    // prefix: 'api/v',
+    defaultVersion: ['1', '2'],
+  });
+
   await app.listen(configService.get<string>('PORT') ?? 3000);
 }
 bootstrap();
