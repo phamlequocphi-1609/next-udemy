@@ -1,16 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './schema/user.schema';
+import { User as UserM, UserDocument } from './schema/user.schema';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcryptjs';
 import type { SoftDeleteModel } from 'soft-delete-plugin-mongoose/dist/src';
+import type { IUser } from './users.interface';
+import { User } from 'src/decorator/customize';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(UserM.name) private userModel: SoftDeleteModel<UserDocument>,
   ) {}
 
   getHashPassword = (password: string) => {
@@ -19,25 +26,71 @@ export class UsersService {
     return hash;
   };
 
-  async create(createUserDto: CreateUserDto) {
-    const hashPass = this.getHashPassword(createUserDto.password);
-    const user = await this.userModel.create({
-      email: createUserDto.email,
+  async create(createUserDto: CreateUserDto, @User() user: IUser) {
+    const { name, email, password, age, gender, address, role, company } =
+      createUserDto;
+    const isExit = await this.userModel.findOne({ email });
+    if (isExit) {
+      throw new BadRequestException(
+        `Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`,
+      );
+    }
+    const hashPass = this.getHashPassword(password);
+    const newUser = await this.userModel.create({
+      email,
       password: hashPass,
-      name: createUserDto.name,
+      name,
+      age,
+      gender,
+      address,
+      role,
+      company,
+      createdBy: {
+        _id: user._id,
+        email: user.email,
+      },
     });
-    return user;
+    return newUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(currentPage: number, limit: number, qs: string) {
+    const { filter, sort, population } = aqp(qs);
+    delete filter.page;
+    delete filter.limit;
+
+    let offset = (currentPage - 1) * +limit;
+    let defaultLimit = +limit ? +limit : 10;
+
+    const totalItem = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItem / defaultLimit);
+
+    const result = await this.userModel
+      .find(filter)
+      .skip(offset)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .select('-password')
+      .populate(population)
+      .exec();
+
+    return {
+      meta: {
+        current: currentPage,
+        pageSize: defaultLimit,
+        pages: totalPages,
+        total: totalItem,
+      },
+      result,
+    };
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) return 'not found user';
-    return this.userModel.findOne({
-      _id: id,
-    });
+    return await this.userModel
+      .findOne({
+        _id: id,
+      })
+      .select('-password');
   }
 
   findOneByUsername(username: string) {
@@ -57,8 +110,39 @@ export class UsersService {
     );
   }
 
-  remove(id: string) {
+  async remove(id: string, @User() user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) return 'not found user';
+    await this.userModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
     return this.userModel.softDelete({ _id: id });
+  }
+
+  async register(user: RegisterUserDto) {
+    const { address, age, email, gender, name, password } = user;
+
+    const isExit = await this.userModel.findOne({ email });
+    if (isExit) {
+      throw new BadRequestException(
+        `Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`,
+      );
+    }
+    const hashPassword = this.getHashPassword(password);
+    let newRegister = await this.userModel.create({
+      name,
+      email,
+      password: hashPassword,
+      age,
+      gender,
+      address,
+      role: 'USER',
+    });
+    return newRegister;
   }
 }
