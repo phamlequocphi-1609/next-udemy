@@ -49,9 +49,11 @@ export class UsersController {
     return foundUser;
   }
 
+  @ResponseMessage('Update a user')
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(updateUserDto);
+  async update(@Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
+    let updateUser = await this.usersService.update(updateUserDto, user);
+    return updateUser;
   }
 
   @Delete(':id')

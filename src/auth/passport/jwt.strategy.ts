@@ -12,7 +12,7 @@ interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
-    const jwtSecret = configService.get<string>('JWT_ACCESS_TOKEN');
+    const jwtSecret = configService.get<string>('JWT_ACCESS_TOKEN_SECRET');
 
     // quá trình giải mã token ( decoded )
     super({

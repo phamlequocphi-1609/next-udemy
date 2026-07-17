@@ -75,12 +75,12 @@ export class UsersService {
 
     return {
       meta: {
-        current: currentPage,
-        pageSize: defaultLimit,
-        pages: totalPages,
-        total: totalItem,
+        current: currentPage, // trang hiện tại
+        pageSize: defaultLimit, // số lượng bản ghi đã lấy
+        pages: totalPages, // tổng số trang với điều kiện query
+        total: totalItem, // tổng số phần tử ( sổ bản ghi )
       },
-      result,
+      result, // kết quả query
     };
   }
 
@@ -90,7 +90,7 @@ export class UsersService {
       .findOne({
         _id: id,
       })
-      .select('-password');
+      .select('-password'); // exclude ( use - ) >< include
   }
 
   findOneByUsername(username: string) {
@@ -103,11 +103,18 @@ export class UsersService {
     return bcrypt.compareSync(password, hash);
   }
 
-  async update(updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateOne(
+  async update(updateUserDto: UpdateUserDto, user: IUser) {
+    const update = await this.userModel.updateOne(
       { _id: updateUserDto._id },
-      { ...updateUserDto },
+      {
+        ...updateUserDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
     );
+    return update;
   }
 
   async remove(id: string, @User() user: IUser) {
@@ -126,9 +133,9 @@ export class UsersService {
 
   async register(user: RegisterUserDto) {
     const { address, age, email, gender, name, password } = user;
-
     const isExit = await this.userModel.findOne({ email });
     if (isExit) {
+      // ném error 400
       throw new BadRequestException(
         `Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`,
       );

@@ -17,6 +17,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
+  @ResponseMessage('Login success')
   @Post('/login')
   handleLogin(@Request() req) {
     return this.authService.login(req.user);
