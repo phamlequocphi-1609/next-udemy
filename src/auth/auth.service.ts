@@ -62,7 +62,7 @@ export class AuthService {
     let newUser = await this.userService.register(user);
     return {
       _id: newUser?._id,
-      createdAt: newUser?.createAt,
+      createdAt: newUser?.createdAt,
     };
   }
 

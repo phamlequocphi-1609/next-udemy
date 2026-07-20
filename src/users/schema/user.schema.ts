@@ -54,10 +54,10 @@ export class User {
   };
 
   @Prop()
-  createAt: Date;
+  createdAt: Date;
 
   @Prop()
-  updateAt: Date;
+  updatedAt: Date;
 
   @Prop()
   isDeleted: boolean;
