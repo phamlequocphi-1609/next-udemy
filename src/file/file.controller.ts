@@ -10,25 +10,48 @@ import {
   UploadedFile,
   ParseFilePipeBuilder,
   HttpStatus,
+  FileValidator,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResponseMessage } from 'src/decorator/customize';
+
+export interface CustomUploadTypeValidatorOptions {
+  fileType: RegExp;
+}
+
+export class CustomUploadTypeValidator extends FileValidator<CustomUploadTypeValidatorOptions> {
+  buildErrorMessage(): string {
+    return `Validation failed (expected type is ${this.validationOptions.fileType})`;
+  }
+  isValid(file: Express.Multer.File): boolean {
+    if (!file) return false;
+    const extension = file.originalname.split('.').pop() || '';
+    return (
+      this.validationOptions.fileType.test(file.mimetype) ||
+      this.validationOptions.fileType.test(extension)
+    );
+  }
+}
 
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post('upload')
+  @ResponseMessage('Upload single file')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(
     @UploadedFile(
       new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType:
-            /^(jpg|jpeg|png|image\/png|gif|txt|pdf|doc|docx|text\/plain|application\/pdf)$/i,
-        })
+        .addValidator(
+          new CustomUploadTypeValidator({
+            fileType:
+              /^(jpg|jpeg|png|image\/png|gif|txt|pdf|doc|docx|text\/plain|application\/pdf)$/i,
+          }),
+        )
         .addMaxSizeValidator({
           maxSize: 1024 * 1000, // tối đa 1MB
         })
@@ -38,7 +61,9 @@ export class FileController {
     )
     file: Express.Multer.File,
   ) {
-    console.log(file);
+    return {
+      fileName: file.filename,
+    };
   }
 
   @Get()
