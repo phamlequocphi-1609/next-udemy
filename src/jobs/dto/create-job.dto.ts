@@ -17,6 +17,9 @@ export class Company {
 
   @IsNotEmpty()
   name: string;
+
+  @IsNotEmpty()
+  logo: string;
 }
 
 export class CreateJobDto {
@@ -61,4 +64,7 @@ export class CreateJobDto {
   @IsNotEmpty({ message: 'isActive không được để trống' })
   @IsBoolean({ message: 'isActive có định dạng là boolean' })
   isActive: boolean;
+
+  @IsNotEmpty({ message: 'Location không được bỏ trống' })
+  location: string;
 }

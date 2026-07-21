@@ -10,6 +10,7 @@ import { Connection } from 'mongoose';
 import { CompaniesModule } from './companies/companies.module';
 import { JobsModule } from './jobs/jobs.module';
 import { FileModule } from './file/file.module';
+import { ResumesModule } from './resumes/resumes.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { FileModule } from './file/file.module';
     CompaniesModule,
     JobsModule,
     FileModule,
+    ResumesModule,
   ],
   controllers: [AppController],
   providers: [

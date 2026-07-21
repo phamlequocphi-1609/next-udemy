@@ -28,6 +28,7 @@ export class JobsService {
       salary,
       skills,
       startDate,
+      location,
     } = createJobDto;
 
     if (!dayjs(startDate).isBefore(dayjs(endDate))) {
@@ -45,6 +46,7 @@ export class JobsService {
       startDate,
       endDate,
       isActive,
+      location,
       createdBy: {
         _id: user._id,
         email: user.email,
