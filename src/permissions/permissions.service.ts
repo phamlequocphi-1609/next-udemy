@@ -3,7 +3,7 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import type { SoftDeleteModel } from 'soft-delete-plugin-mongoose/dist/src';
-import { PermissionDocument } from './schema/permission.schema';
+import { Permission, PermissionDocument } from './schema/permission.schema';
 import { IUser } from 'src/users/users.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
@@ -11,7 +11,7 @@ import mongoose from 'mongoose';
 @Injectable()
 export class PermissionsService {
   constructor(
-    @InjectModel(Permissions.name)
+    @InjectModel(Permission.name)
     private permissionModel: SoftDeleteModel<PermissionDocument>,
   ) {}
 
