@@ -6,12 +6,15 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
+import { RolesService } from 'src/roles/roles.service';
+import { permission } from 'process';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private roleService: RolesService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -19,14 +22,21 @@ export class AuthService {
     if (user) {
       const isValid = this.userService.isValidPassword(password, user.password);
       if (isValid) {
-        return user;
+        const userRole = user.role as unknown as { _id: string; name: string };
+        const temp = await this.roleService.findOne(userRole._id);
+
+        const objUser = {
+          ...user.toObject(),
+          permissions: temp?.permissions ?? [],
+        };
+        return objUser;
       }
     }
     return null;
   }
 
   async login(user: IUser, response: Response) {
-    const { _id, email, name, role } = user;
+    const { _id, email, name, role, permissions } = user;
     const payload = {
       sub: 'token login',
       iss: 'from server',
@@ -54,6 +64,7 @@ export class AuthService {
         name,
         email,
         role,
+        permissions,
       },
     };
   }
@@ -101,6 +112,10 @@ export class AuthService {
 
         // update user with refresh token
         await this.userService.updateUserToken(refresh_token, _id.toString());
+
+        // fetch user's role
+        const userRole = user.role as unknown as { _id: string; name: string };
+        const temp = await this.roleService.findOne(userRole._id);
         // set refresh_token as cookies
         response.clearCookie('refresh_token');
 
@@ -117,6 +132,7 @@ export class AuthService {
             name,
             email,
             role,
+            permissions: temp?.permissions ?? [],
           },
         };
       } else {
