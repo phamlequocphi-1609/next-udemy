@@ -16,24 +16,33 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    // const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    //   context.getHandler(),
+    //   context.getClass(),
+    // ]);
 
-    if (isPublic) {
-      return true;
-    }
+    // if (isPublic) {
+    //   return true;
+    // }
 
     return super.canActivate(context);
   }
 
   handleRequest(err, user, info, context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest();
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     const isSkipPermission = this.reflector.getAllAndOverride<boolean>(
       IS_PUBLIC_PERMISSION,
       [context.getHandler(), context.getClass()],
     );
+
+    if (isPublic) {
+      return user || null;
+    }
+
     if (err || !user) {
       throw (
         err ||

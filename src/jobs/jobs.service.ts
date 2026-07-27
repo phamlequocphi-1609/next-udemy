@@ -59,7 +59,7 @@ export class JobsService {
     };
   }
 
-  async findAll(currentPage: number, limit: number, qs: string) {
+  async findAll(currentPage: number, limit: number, qs: string, user: IUser) {
     const { filter, sort, population, projection } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
@@ -67,6 +67,11 @@ export class JobsService {
     let defaultLimit = +limit ? +limit : 10;
     let current = +currentPage ? +currentPage : 1;
     let offset = (current - 1) * defaultLimit;
+    if (user?.company?._id) {
+      filter['company._id'] = {
+        $in: [user.company._id, new mongoose.Types.ObjectId(user.company._id)],
+      };
+    }
 
     const totalItems = (await this.jobModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
