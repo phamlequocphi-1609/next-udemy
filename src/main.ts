@@ -8,6 +8,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
@@ -48,6 +49,9 @@ async function bootstrap() {
     // prefix: 'api/v',
     defaultVersion: ['1', '2'],
   });
+
+  // config helmet -> giúp an toàn hơn
+  app.use(helmet());
 
   await app.listen(configService.get<string>('PORT') ?? 3000);
 }
