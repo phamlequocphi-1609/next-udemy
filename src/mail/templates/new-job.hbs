@@ -1,0 +1,115 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>New Jobs for You</title>
+  </head>
+  <body
+    style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f5f5f5; color: #333333;"
+  >
+    <table
+      border='0'
+      cellpadding='0'
+      cellspacing='0'
+      width='100%'
+      style='table-layout: fixed; background-color: #f5f5f5; padding: 40px 20px;'
+    >
+      <tr>
+        <td align='center'>
+          <table
+            border='0'
+            cellpadding='0'
+            cellspacing='0'
+            width='100%'
+            style='max-width: 500px; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);'
+          >
+            <!-- Header -->
+            <tr>
+              <td style='padding: 24px 24px 12px 24px;'>
+                <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                  <tr>
+                    <td
+                      align='left'
+                      style='font-size: 20px; font-weight: bold; color: #1a1a1a;'
+                    >
+                      Hỏi Dân IT
+                    </td>
+                    <td
+                      align='right'
+                      style='font-size: 16px; color: #666666; font-style: italic;'
+                    >
+                      Ít nhưng mà chất
+                    </td>
+                  </tr>
+                </table>
+                <div
+                  style='height: 1px; background-color: #e0e0e0; margin-top: 16px;'
+                ></div>
+              </td>
+            </tr>
+
+            <!-- Body / Salutation -->
+            <tr>
+              <td
+                style='padding: 12px 24px 12px 24px; font-size: 16px; line-height: 1.5; color: #333333;'
+              >
+                <p style='margin: 0 0 8px 0; font-weight: 500;'>Hi
+                  {{receiver}},</p>
+                <p style='margin: 0 0 20px 0; color: #555555;'>One of these jobs
+                  may be your next one. Find out today!</p>
+              </td>
+            </tr>
+
+            <!-- Jobs List -->
+            <tr>
+              <td style='padding: 0 24px 12px 24px;'>
+                <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                  {{#each jobs}}
+                    <tr>
+                      <td style='padding-bottom: 24px;'>
+                        <a
+                          href='#'
+                          style='text-decoration: none; font-size: 16px; font-weight: 600; color: #3b5998; display: block; margin-bottom: 4px;'
+                        >
+                          {{name}}
+                        </a>
+                        <div
+                          style='font-size: 14px; color: #333333; margin-bottom: 4px; font-weight: 500;'
+                        >
+                          {{company}}
+                        </div>
+                        <div
+                          style='font-size: 14px; color: #e74c3c; margin-bottom: 4px; font-weight: bold;'
+                        >
+                          {{salary}}
+                        </div>
+                        <div style='font-size: 14px; color: #7f8c8d;'>
+                          {{#each skills}}
+                            <span style='font-size: 14px;'>{{this}}</span>
+                          {{/each}}
+                        </div>
+                      </td>
+                    </tr>
+                  {{/each}}
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer Action Button -->
+            <tr>
+              <td align='center' style='padding: 12px 24px 32px 24px;'>
+                <a
+                  href='https://hoidanit.com.vn'
+                  target='_blank'
+                  style='display: block; width: 100%; text-decoration: none; background-color: #f82c2c; color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; padding: 12px 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(248, 44, 44, 0.2);'
+                >
+                  Xem thêm job tại Hỏi Dân IT
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
