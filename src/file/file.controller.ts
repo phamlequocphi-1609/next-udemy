@@ -11,6 +11,7 @@ import {
   ParseFilePipeBuilder,
   HttpStatus,
   FileValidator,
+  UseFilters,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
@@ -18,6 +19,7 @@ import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResponseMessage } from 'src/decorator/customize';
 import { ApiTags } from '@nestjs/swagger';
+import { HttpExceptionFilter } from 'src/core/http-exception.filter';
 
 export interface CustomUploadTypeValidatorOptions {
   fileType: RegExp;
@@ -45,29 +47,34 @@ export class FileController {
   @Post('upload')
   @ResponseMessage('Upload single file')
   @UseInterceptors(FileInterceptor('fileUpload'))
-  uploadFile(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addValidator(
-          new CustomUploadTypeValidator({
-            fileType:
-              /^(jpg|jpeg|image\/jpeg|png|image\/png|gif|txt|pdf|doc|docx|text\/plain|application\/pdf)$/i,
-          }),
-        )
-        .addMaxSizeValidator({
-          maxSize: 1024 * 1000, // tối đa 1MB
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY, // mã lỗi 422
-        }),
-    )
-    file: Express.Multer.File,
-  ) {
+  @UseFilters(new HttpExceptionFilter())
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
       fileName: file.filename,
     };
   }
-
+  // uploadFile(
+  //   @UploadedFile(
+  //     new ParseFilePipeBuilder()
+  //       .addValidator(
+  //         new CustomUploadTypeValidator({
+  //           fileType:
+  //             /^(jpg|jpeg|image\/jpeg|png|image\/png|gif|txt|pdf|doc|docx|text\/plain|application\/pdf)$/i,
+  //         }),
+  //       )
+  //       .addMaxSizeValidator({
+  //         maxSize: 1024 * 1000, // tối đa 1MB
+  //       })
+  //       .build({
+  //         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY, // mã lỗi 422
+  //       }),
+  //   )
+  //   file: Express.Multer.File,
+  // ) {
+  //   return {
+  //     fileName: file.filename,
+  //   };
+  // }
   @Get()
   findAll() {
     return this.fileService.findAll();
