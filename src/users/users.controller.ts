@@ -15,8 +15,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import mongoose from 'mongoose';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import type { IUser } from './users.interface';
+import { ApiTags } from '@nestjs/swagger';
 
 //decorator + gộm tới ví dụ . user  + eric => /user/eric
+@ApiTags('users')
 @Controller('users') // => /users
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

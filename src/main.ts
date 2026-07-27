@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
@@ -52,6 +53,29 @@ async function bootstrap() {
 
   // config helmet -> giúp an toàn hơn
   app.use(helmet());
+
+  // config swagger
+  const config = new DocumentBuilder()
+    .setTitle('NextJS Series APIs Document')
+    .setDescription('All module API')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'token',
+    )
+    .addSecurityRequirements('token')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, documentFactory, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   await app.listen(configService.get<string>('PORT') ?? 3000);
 }
