@@ -22,11 +22,6 @@ export class MailController {
     private jobModel: SoftDeleteModel<JobDocument>,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  testCron() {
-    console.log('>>> call me');
-  }
-
   @Get()
   @Public()
   @ResponseMessage('Test email')
