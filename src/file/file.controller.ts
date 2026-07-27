@@ -36,7 +36,7 @@ export class CustomUploadTypeValidator extends FileValidator<CustomUploadTypeVal
   }
 }
 
-@Controller('file')
+@Controller('files')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
